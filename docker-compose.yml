@@ -22,7 +22,7 @@ services:
     container_name: 'avot_bot_main'
   worker:
     build: .
-    command: rq worker --url redis://avatar_bot_redis:6380
+    command: rq worker --url redis://avot_bot_redis:6380
     restart: always
     env_file:
       - .env
