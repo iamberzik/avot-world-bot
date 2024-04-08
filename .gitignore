@@ -1,0 +1,10 @@
+.venv
+.idea
+.handler-saves
+
+.env
+
+generator_conf.py
+generator/video_generator/*
+assets/animated/*
+assets/static/*

@@ -1,0 +1,34 @@
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    hostname: 'avot_bot_redis'
+    command: --port 6380
+    ports:
+      - "6380:6380"
+  avotbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    extra_hosts:
+      - "avot-world.local:192.168.1.200"
+    links:
+      - redis
+    container_name: 'avot_bot_main'
+  worker:
+    build: .
+    command: rq worker --url redis://avatar_bot_redis:6380
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - avotbot
+    links:
+      - redis
+    container_name: 'avot_bot_worker'
