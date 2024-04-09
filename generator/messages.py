@@ -27,6 +27,11 @@ PHOTO_PROCESSING_MESSAGE = {
           'Время ожидания: {time}'
 }
 
+PHOTO_PROCESSING_WITHOUT_QUEUE = {
+    'EN': "Your photo has been sent for processing, please wait for the result",
+    'RU': 'Твоё фото отправлено на обработку, пожалуйста, дождись результата'
+}
+
 REQUEST_ERROR_MESSAGE = {
     'EN': "Oops... something went wrong, please try again :)",
     'RU': 'При обработке произошла ошибка, попробуй ещё раз :)'

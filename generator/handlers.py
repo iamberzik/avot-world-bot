@@ -5,11 +5,12 @@ from api.services import get_all_static_templates_by_bot, get_all_animated_templ
 from api.services import get_template_by_id
 from core.conf import bot
 from core.globals import *
+from core.utils import get_use_queue_mode
 from generator.actors import generate_avatar_actor
 from generator.buttons import OVERLAY_UNDER_BUTTON_TEXT, OVERLAY_ABOVE_BUTTON_TEXT, OVERLAY_IN_LANGUAGES
 from generator.keyboards import get_cover_keyboard
 from generator.keyboards import get_overlay_keyboard
-from generator.messages import LAYOUT_MESSAGE
+from generator.messages import LAYOUT_MESSAGE, PHOTO_PROCESSING_WITHOUT_QUEUE
 from generator.messages import TEMPLATE_MESSAGE, PHOTO_REQUEST_MESSAGE
 from generator.utils import send_covers_message, get_file_from_message, send_layovers, get_execution_time_message
 from menu.buttons import GENERATE_AVATAR_BUTTON_TEXT, GENERATE_VIDEO_BUTTON_TEXT
@@ -32,7 +33,7 @@ def template_display(telegramId: str, language: str, message_text: str) -> None:
         },
         GENERATE_VIDEO_BUTTON_TEXT[language]: {
             "templates": get_all_animated_templates_by_bot(),
-            "type": GENERATOR_ANIMATION_KEY
+            "type": GENERATOR_ANIMATED_KEY
         },
     }
 
@@ -116,9 +117,18 @@ def generation_request_handler(message: Message, telegramId: str, language: str,
         LANGUAGE_KEY: language
     }
 
-    redisQueue.enqueue(generate_avatar_actor, request_data)
+    if get_use_queue_mode():
 
-    message_text = get_execution_time_message(language)
-    keyboard = get_menu_keyboard(language)
+        redisQueue.enqueue(generate_avatar_actor, request_data)
 
-    bot.send_message(telegramId, message_text, reply_markup=keyboard)
+        message_text = get_execution_time_message(language)
+        keyboard = get_menu_keyboard(language)
+
+        bot.send_message(telegramId, message_text, reply_markup=keyboard)
+
+    else:
+        message_text = PHOTO_PROCESSING_WITHOUT_QUEUE[language]
+        keyboard = get_menu_keyboard(language)
+        bot.send_message(telegramId, message_text, reply_markup=keyboard)
+
+        generate_avatar_actor(request_data)

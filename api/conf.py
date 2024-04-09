@@ -18,6 +18,8 @@ def get_tokens() -> dict:
     if response.status_code != 201:
         raise ValueError(ERROR_NOT_AUTH_KEY_TEXT)
 
+    print("Bot authenticated and started")
+
     return response.json()
 
 

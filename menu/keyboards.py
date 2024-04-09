@@ -2,8 +2,8 @@ import os
 
 from telebot.types import ReplyKeyboardMarkup
 
-from core.globals import ENV_GENERATOR_MODE_KEY, GENERATOR_STATIC_KEY, GENERATOR_MIX_KEY, GENERATOR_ANIMATION_KEY, \
-    LANGUAGE_IN_RUSSIAN
+from core.globals import ENV_GENERATOR_MODE_KEY, GENERATOR_STATIC_KEY, GENERATOR_MIX_KEY, LANGUAGE_IN_RUSSIAN, \
+    GENERATOR_ANIMATED_KEY
 from menu.buttons import *
 
 
@@ -19,7 +19,7 @@ def get_menu_keyboard(language: str) -> ReplyKeyboardMarkup:
         buttons.append(GENERATE_VIDEO_BUTTON_TEXT[language])
     elif generator_mode == GENERATOR_STATIC_KEY:
         buttons.append(GENERATE_AVATAR_BUTTON_TEXT[language])
-    elif generator_mode == GENERATOR_ANIMATION_KEY:
+    elif generator_mode == GENERATOR_ANIMATED_KEY:
         buttons.append(GENERATE_VIDEO_BUTTON_TEXT[language])
 
     buttons.append(PROFILE_BUTTON_TEXT[language])

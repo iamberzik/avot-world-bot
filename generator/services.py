@@ -3,7 +3,7 @@ import io
 from PIL import Image
 
 from core.conf import bot
-from core.globals import TELEGRAM_ID_KEY, LANGUAGE_KEY, TEMPLATE_KEY, ID_KEY
+from core.globals import TELEGRAM_ID_KEY, LANGUAGE_KEY, TEMPLATE_KEY, ID_KEY, TMP_IMAGE_VALUE
 from generator.generators import generate_static_avatar
 from generator.messages import REQUEST_SUCCESS_MESSAGE
 from generator_conf import VIDEO_GENERATORS
@@ -16,7 +16,7 @@ def photo_generator_service(photo: Image, worker_data: dict) -> None:
     result = generate_static_avatar(photo, worker_data)
 
     bio = io.BytesIO()
-    bio.name = 'image.png'
+    bio.name = TMP_IMAGE_VALUE
     result.save(bio, 'png')
     bio.seek(0)
 

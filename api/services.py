@@ -6,6 +6,7 @@ from telebot.types import Message
 
 from api.conf import REQUEST_DETAILS
 from api.decorators.request import request
+from core.conf import bot
 from core.globals import *
 
 
@@ -99,7 +100,7 @@ def create_request(data: dict, url: str) -> Response | dict:
         TEMPLATE_ID_KEY: data[TEMPLATE_KEY][ID_KEY],
         USER_OVERLAY_CHOICE_KEY: data[USER_OVERLAY_CHOICE_KEY],
         OCCUPATION_ID_KEY: data[OCCUPATION_KEY][ID_KEY],
-        BOT_ID_KEY: REQUEST_DETAILS[BOT_ID_KEY]
+        BOT_ID_KEY: str(bot.get_me().id)
     }
 
     response = requests.post(url, json=request_data, headers=get_auth_headers())

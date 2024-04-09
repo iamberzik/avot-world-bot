@@ -44,7 +44,7 @@ def send_layovers(telegramId: str, language: str) -> Message:
     return bot.send_message(telegramId, message_text, reply_markup=keyboard)
 
 
-def get_execution_time(language: str, number_of_jobs: int):
+def get_execution_time(language: str, number_of_jobs: int) -> str:
     average_time = round(sum(EXECUTION_TIME_RECORDS) / len(EXECUTION_TIME_RECORDS))
 
     m, s = divmod(number_of_jobs * average_time, 60)
@@ -65,38 +65,38 @@ def get_file_from_message(message: Message) -> str:
     return file_info.file_path
 
 
-def crop_center(pil_img: Image, crop_width: int, crop_height: int) -> Image:
-    img_width, img_height = pil_img.size
-    return pil_img.crop(((img_width - crop_width) // 2,
-                         (img_height - crop_height) // 2,
-                         (img_width + crop_width) // 2,
-                         (img_height + crop_height) // 2))
+def crop_center(image: Image, crop_width: int, crop_height: int) -> Image:
+    img_width, img_height = image.size
+    return image.crop(((img_width - crop_width) // 2,
+                       (img_height - crop_height) // 2,
+                       (img_width + crop_width) // 2,
+                       (img_height + crop_height) // 2))
 
 
-def crop_max_square(pil_img: Image) -> Image:
-    cropped = crop_center(pil_img, min(pil_img.size), min(pil_img.size))
+def crop_max_square(image: Image) -> Image:
+    cropped = crop_center(image, min(image.size), min(image.size))
     return cropped.resize((931, 931), Image.LANCZOS)
 
 
-def get_avatar_mask(pil_img: Image) -> Image:
-    mask = Image.new("L", pil_img.size, 0)
+def get_avatar_mask(image: Image) -> Image:
+    mask = Image.new("L", image.size, 0)
     draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0, pil_img.size[0], pil_img.size[1]), fill=255)
+    draw.ellipse((0, 0, image.size[0], image.size[1]), fill=255)
     return mask
 
 
-def add_photo_to_layer(result: Image, square_avatar: Image, size: tuple[int, int], position: tuple[int, int]) -> Image:
-    circle_avatar = get_circle_photo(square_avatar, size, position, result.size)
-    result.paste(circle_avatar, (0, 0), circle_avatar)
+def add_circle_photo_to_layers(layers_image: Image, photo: Image, size: tuple[int, int], position: tuple[int, int]) -> Image:
+    circle_avatar = get_circle_photo(photo, size, position, layers_image.size)
+    layers_image.paste(circle_avatar, (0, 0), circle_avatar)
 
-    return result
+    return layers_image
 
 
-def get_circle_photo(square_avatar: Image, size: tuple[int, int], position: tuple[int, int],
+def get_circle_photo(photo: Image, size: tuple[int, int], position: tuple[int, int],
                      original_size: tuple[int, int]) -> Image:
     user_avatar_layer = Image.new('RGBA', original_size, (0, 0, 0, 0))
-    square_avatar = square_avatar.resize(size)
-    mask = get_avatar_mask(square_avatar)
+    photo = photo.resize(size)
+    mask = get_avatar_mask(photo)
 
-    user_avatar_layer.paste(square_avatar, position, mask)
+    user_avatar_layer.paste(photo, position, mask)
     return user_avatar_layer

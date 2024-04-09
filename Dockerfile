@@ -14,4 +14,4 @@ RUN pip install -r reqs.txt
 
 COPY . .
 
-CMD ["python", "main.py"]
+CMD ["python", "-u", "main.py"]
