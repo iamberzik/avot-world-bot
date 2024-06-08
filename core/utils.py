@@ -1,3 +1,4 @@
+import ast
 import os
 from typing import List
 
@@ -7,19 +8,18 @@ from core.globals import *
 from menu.buttons import GENERATE_AVATAR_BUTTON_TEXT, GENERATE_VIDEO_BUTTON_TEXT
 
 
-def get_message_text(message_text: dict, language: str) -> str:
-    if language == LANGUAGE_MULTY_KEY:
-        return f"{message_text[LANGUAGE_EN_KEY]}\n\n{message_text[LANGUAGE_RU_KEY]}"
+def get_message_text(message_text: dict, language: List[str] | str) -> str:
+    if type(language) is str:
+        return message_text[language]
 
-    return message_text[language]
+    if len(language) > 1:
+        return "\n\n".join([message_text[key] for key in language])
+
+    return message_text[language[0]]
 
 
 def get_status_or_occupation_title_by_language(item: dict, language: str) -> str:
-    if language == LANGUAGE_RU_KEY:
-        return item[TITLE_RU_KEY]
-
-    if language == LANGUAGE_EN_KEY:
-        return item[TITLE_EN_KEY]
+    return item[TITLE_LANGUAGE_KEYS[language]]
 
 
 def get_status_or_occupation_title_list(items: List[dict], language: str) -> List[str]:
@@ -28,16 +28,17 @@ def get_status_or_occupation_title_list(items: List[dict], language: str) -> Lis
 
 def get_default_language(message: Message, user_language: str = None) -> str:
     user_telegram_language = message.from_user.language_code.upper()
-    system_language = os.getenv(ENV_LANGUAGE_MODE_KEY, None)
+    system_language_list_env = os.getenv(ENV_LANGUAGES_LIST_KEY, None)
+    system_language_list = ast.literal_eval(system_language_list_env)
 
     if user_language:
         return user_language
-    elif system_language != LANGUAGE_MULTY_KEY:
-        return system_language
-    elif user_telegram_language in [LANGUAGE_RU_KEY, LANGUAGE_EN_KEY]:
+    elif len(system_language_list) == 1:
+        return system_language_list[0]
+    elif user_telegram_language in SUPPORTED_LANGUAGES.keys():
         return user_telegram_language
 
-    return LANGUAGE_EN_KEY
+    return LANGUAGE_RU_KEY
 
 
 def get_debug_mode() -> bool:

@@ -16,7 +16,7 @@ services:
     depends_on:
       - redis
     extra_hosts:
-      - "avot-world.local:192.168.1.200"
+      - "avot-world.local:192.168.1.64"
     links:
       - redis
     container_name: 'avot_bot_main'
@@ -31,4 +31,6 @@ services:
       - avotbot
     links:
       - redis
+    extra_hosts:
+      - "avot-world.local:192.168.1.64"
     container_name: 'avot_bot_worker'

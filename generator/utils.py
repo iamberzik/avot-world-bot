@@ -2,7 +2,8 @@ from PIL import Image, ImageDraw
 from telebot.types import InputMediaPhoto, Message
 
 from core.conf import bot
-from core.globals import USERS_TMP, TEMPLATE_LIST_KEY, ID_KEY, EXECUTION_TIME_RECORDS
+from core.globals import USERS_TMP, TEMPLATE_LIST_KEY, ID_KEY, EXECUTION_TIME_RECORDS, PHOTO_CIRCLE_SHAPE, \
+    PHOTO_SQUARE_SHAPE
 from generator.keyboards import get_overlay_keyboard, get_cover_keyboard
 from generator.messages import LAYOUT_MESSAGE, TEMPLATE_MESSAGE, MINUTE_TEXT, SECONDS_TEXT, PHOTO_PROCESSING_MESSAGE
 from redis_conf import redisQueue
@@ -78,25 +79,31 @@ def crop_max_square(image: Image) -> Image:
     return cropped.resize((931, 931), Image.LANCZOS)
 
 
-def get_avatar_mask(image: Image) -> Image:
+def get_avatar_mask(image: Image, shape: str) -> Image:
     mask = Image.new("L", image.size, 0)
     draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0, image.size[0], image.size[1]), fill=255)
+
+    if shape == PHOTO_CIRCLE_SHAPE:
+        draw.ellipse((0, 0, image.size[0], image.size[1]), fill=255)
+    elif shape == PHOTO_SQUARE_SHAPE:
+        draw.rectangle((0, 0, image.size[0], image.size[1]), fill=255)
+
     return mask
 
 
-def add_circle_photo_to_layers(layers_image: Image, photo: Image, size: tuple[int, int], position: tuple[int, int]) -> Image:
-    circle_avatar = get_circle_photo(photo, size, position, layers_image.size)
-    layers_image.paste(circle_avatar, (0, 0), circle_avatar)
+def add_photo_to_layers(layers_image: Image, photo: Image, size: tuple[int, int], position: tuple[int, int],
+                        shape: str) -> Image:
+    avatar = get_prepared_photo(photo, size, position, layers_image.size, shape)
+    layers_image.paste(avatar, (0, 0), avatar)
 
     return layers_image
 
 
-def get_circle_photo(photo: Image, size: tuple[int, int], position: tuple[int, int],
-                     original_size: tuple[int, int]) -> Image:
+def get_prepared_photo(photo: Image, size: tuple[int, int], position: tuple[int, int],
+                       original_size: tuple[int, int], shape: str) -> Image:
     user_avatar_layer = Image.new('RGBA', original_size, (0, 0, 0, 0))
     photo = photo.resize(size)
-    mask = get_avatar_mask(photo)
+    mask = get_avatar_mask(photo, shape)
 
     user_avatar_layer.paste(photo, position, mask)
     return user_avatar_layer

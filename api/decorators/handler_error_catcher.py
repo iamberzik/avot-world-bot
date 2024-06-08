@@ -1,3 +1,4 @@
+import traceback
 from typing import Callable
 
 from api.services import get_or_create_user
@@ -40,6 +41,7 @@ def handler_error_catcher(debug: bool = get_debug_mode()):
             except Exception as e:
 
                 if debug:
+                    print(traceback.format_exc())
                     print(e)
 
                 user_id = message.from_user.id

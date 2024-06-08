@@ -28,16 +28,16 @@ def generator_handler(message: Message, telegramId: str, language: str, **kwargs
 def template_display(telegramId: str, language: str, message_text: str) -> None:
     templates_switcher = {
         GENERATE_AVATAR_BUTTON_TEXT[language]: {
-            "templates": get_all_static_templates_by_bot(),
-            "type": GENERATOR_STATIC_KEY
+            TEMPLATES_SWITCHER_KEY: get_all_static_templates_by_bot,
+            TYPE_KEY: GENERATOR_STATIC_KEY
         },
         GENERATE_VIDEO_BUTTON_TEXT[language]: {
-            "templates": get_all_animated_templates_by_bot(),
-            "type": GENERATOR_ANIMATED_KEY
+            TEMPLATES_SWITCHER_KEY: get_all_animated_templates_by_bot,
+            TYPE_KEY: GENERATOR_ANIMATED_KEY
         },
     }
 
-    templates = templates_switcher[message_text][TEMPLATES_SWITCHER_KEY]
+    templates = templates_switcher[message_text][TEMPLATES_SWITCHER_KEY]()
     template_type = templates_switcher[message_text][TYPE_KEY]
 
     if len(templates) > 1:

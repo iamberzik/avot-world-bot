@@ -1,7 +1,7 @@
 from PIL import Image
 
 from core.globals import *
-from generator.utils import add_circle_photo_to_layers
+from generator.utils import add_photo_to_layers
 from generator_conf import STATIC_GENERATOR_TEMPLATES
 
 
@@ -42,8 +42,8 @@ def generate_static_avatar(photo: Image, worker_data: dict) -> Image:
             result.paste(layer_object, (0, 0), layer_object)
 
         if layer[TYPE_KEY] == PHOTO_KEY and not template_overlaying:
-            add_circle_photo_to_layers(result, photo, generator_photo_params[SIZE_KEY],
-                                       generator_photo_params[POSITION_KEY])
+            add_photo_to_layers(result, photo, generator_photo_params[SIZE_KEY],
+                                generator_photo_params[POSITION_KEY], generator_photo_params[PHOTO_SHAPE_KEY])
 
         if layer[TYPE_KEY] == PHOTO_KEY and template_overlaying and not photo_placed:
 
@@ -51,8 +51,8 @@ def generate_static_avatar(photo: Image, worker_data: dict) -> Image:
 
             if user_overlay == GENERATOR_OVERLAY_INSIDE_KEY:
 
-                add_circle_photo_to_layers(result, photo, generator_photo_params[SIZE_KEY],
-                                           generator_photo_params[POSITION_KEY])
+                add_photo_to_layers(result, photo, generator_photo_params[SIZE_KEY],
+                                    generator_photo_params[POSITION_KEY], generator_photo_params[PHOTO_SHAPE_KEY])
                 photo_placed = True
                 continue
             elif user_overlay == GENERATOR_OVERLAY_ABOVE_KEY and not photo_skipped:
@@ -61,8 +61,8 @@ def generate_static_avatar(photo: Image, worker_data: dict) -> Image:
                 continue
             else:
 
-                add_circle_photo_to_layers(result, photo, generator_photo_params[SIZE_KEY],
-                                           generator_photo_params[POSITION_KEY])
+                add_photo_to_layers(result, photo, generator_photo_params[SIZE_KEY],
+                                    generator_photo_params[POSITION_KEY], generator_photo_params[PHOTO_SHAPE_KEY])
                 photo_placed = True
                 continue
 

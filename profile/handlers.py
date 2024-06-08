@@ -1,3 +1,4 @@
+import ast
 import os
 from typing import Callable
 
@@ -17,15 +18,17 @@ from profile.utils import get_profile_message
 
 @handler_error_catcher()
 def language_handler(message: Message, telegramId: str, language: str, **kwargs) -> None:
-    if message.text not in LANGUAGE_IN_RUSSIAN.keys():
-        language_mode = os.getenv(ENV_LANGUAGE_MODE_KEY)
-        message_text = get_message_text(SELECT_LANGUAGE_MESSAGE, language or language_mode)
+    if message.text not in SUPPORTED_LANGUAGES.values():
+        languages_list_env = os.getenv(ENV_LANGUAGES_LIST_KEY)
+        languages_list = ast.literal_eval(languages_list_env)
+
+        message_text = get_message_text(SELECT_LANGUAGE_MESSAGE, language or languages_list)
         keyboard = get_language_keyboard()
 
         msg = bot.send_message(telegramId, message_text, reply_markup=keyboard)
         return bot.register_next_step_handler(msg, language_handler)
 
-    USERS_TMP[telegramId][LANGUAGE_KEY] = LANGUAGE_IN_RUSSIAN[message.text]
+    USERS_TMP[telegramId][LANGUAGE_KEY] = [k for k, v in SUPPORTED_LANGUAGES.items() if v == message.text][0]
 
     user = update_user(message)
 
@@ -127,15 +130,16 @@ def change_profile_handler(message: Message, telegramId: str, **kwargs) -> None:
 
 
 def language_display(message: Message, telegramId: str) -> None:
-    language_mode = os.getenv(ENV_LANGUAGE_MODE_KEY)
+    languages_list_env = os.getenv(ENV_LANGUAGES_LIST_KEY)
+    languages_list = ast.literal_eval(languages_list_env)
 
-    if language_mode == LANGUAGE_MULTY_KEY:
-        message_text = get_message_text(SELECT_LANGUAGE_MESSAGE, language_mode)
+    if len(languages_list) > 1:
+        message_text = get_message_text(SELECT_LANGUAGE_MESSAGE, languages_list)
         keyboard = get_language_keyboard()
         msg = bot.send_message(telegramId, message_text, reply_markup=keyboard)
         return bot.register_next_step_handler(msg, language_handler)
 
-    USERS_TMP[telegramId][LANGUAGE_KEY] = language_mode
+    USERS_TMP[telegramId][LANGUAGE_KEY] = languages_list[0]
 
     user = update_user(message)
 
