@@ -57,7 +57,8 @@ def template_handler(message: Message, telegramId: str, language: str, **kwargs)
         msg = bot.send_message(telegramId, message_text, reply_markup=keyboard)
         return bot.register_next_step_handler(msg, template_handler)
 
-    template = get_template_by_id(message.text)
+    template_id = USERS_TMP[telegramId][TEMPLATE_LIST_KEY][message.text]
+    template = get_template_by_id(template_id)
     USERS_TMP[telegramId][TEMPLATE_KEY] = template
 
     overlay_display(telegramId, language)

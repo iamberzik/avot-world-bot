@@ -46,7 +46,7 @@ def get_debug_mode() -> bool:
 
 
 def get_use_queue_mode() -> bool:
-    return os.getenv(ENV_DEBUG_KEY, "True").lower() in ["true", 1]
+    return os.getenv(ENV_USE_QUEUE_KEY, "True").lower() in ["true", 1]
 
 
 def get_generate_buttons() -> str:
